@@ -1,107 +1,72 @@
-const {
-  Client,
-  GatewayIntentBits,
-  REST,
-  Routes,
-  SlashCommandBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
-} = require('discord.js');
+const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
+const path = require("path");
+const fs = require("fs");
+const config = require("../config.json");
+const { loadCategories } = require("./systems/categories");
 
-// Load environment variables
-const token = process.env.BOT_TOKEN;
-const clientId = process.env.CLIENT_ID;
-
-if (!token || !clientId) {
-  console.error("❌ Missing BOT_TOKEN or CLIENT_ID in Railway variables.");
-  process.exit(1);
-}
-
-// Truth or Dare lists
-const truths = [
-  "What is your biggest fear?",
-  "What is a secret you’ve never told anyone?",
-  "Who was your first crush?",
-  "What is something embarrassing you’ve done?"
-];
-
-const dares = [
-  "Do 10 push-ups.",
-  "Say the alphabet backwards.",
-  "Send a funny emoji in the chat.",
-  "Speak only in emojis for the next 2 minutes."
-];
-
-// Create client
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-// Slash commands
-const commands = [
-  new SlashCommandBuilder()
-    .setName('tod')
-    .setDescription('Start a Truth or Dare game')
-].map(cmd => cmd.toJSON());
+client.commands = new Collection();
 
-// Register commands
+const commands = [];
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+  const command = require(path.join(commandsPath, file));
+  if ("data" in command && "execute" in command) {
+    client.commands.set(command.data.name, command);
+    commands.push(command.data.toJSON());
+  }
+}
+
+const rest = new REST({ version: "10" }).setToken(config.bot.token);
+
 (async () => {
   try {
-    console.log("Registering commands...");
-    const rest = new REST({ version: '10' }).setToken(token);
-    await rest.put(Routes.applicationCommands(clientId), { body: commands });
-    console.log("Commands registered.");
-  } catch (err) {
-    console.error(err);
+    console.log("Registering global application commands...");
+    await rest.put(
+      Routes.applicationCommands(config.bot.clientId),
+      { body: commands }
+    );
+    console.log("Commands registered globally.");
+  } catch (error) {
+    console.error(error);
   }
 })();
 
-// Bot ready
-client.once('ready', () => {
+client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
+  client.user.setPresence({
+    activities: [{ name: config.bot.presence }],
+    status: "online"
+  });
+  loadCategories();
 });
 
-// Handle interactions
-client.on('interactionCreate', async interaction => {
+client.on("interactionCreate", async interaction => {
   if (interaction.isChatInputCommand()) {
-    if (interaction.commandName === 'tod') {
-
-      const embed = new EmbedBuilder()
-        .setTitle("🎲 Truth or Dare")
-        .setDescription("Choose one of the buttons below to begin!")
-        .setColor("Purple");
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('truth')
-          .setLabel('Truth')
-          .setStyle(ButtonStyle.Primary),
-
-        new ButtonBuilder()
-          .setCustomId('dare')
-          .setLabel('Dare')
-          .setStyle(ButtonStyle.Danger)
-      );
-
-      return interaction.reply({ embeds: [embed], components: [row] });
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      console.error(error);
+      if (!interaction.replied) {
+        await interaction.reply({ content: "There was an error executing this command.", ephemeral: true });
+      }
     }
-  }
-
-  // Button interactions
-  if (interaction.isButton()) {
-    if (interaction.customId === 'truth') {
-      const randomTruth = truths[Math.floor(Math.random() * truths.length)];
-      return interaction.reply(`🟦 **Truth:** ${randomTruth}`);
-    }
-
-    if (interaction.customId === 'dare') {
-      const randomDare = dares[Math.floor(Math.random() * dares.length)];
-      return interaction.reply(`🟥 **Dare:** ${randomDare}`);
+  } else {
+    // Component / modal routing
+    const tod = require("./commands/tod");
+    try {
+      await tod.handleComponent(interaction);
+    } catch (error) {
+      console.error(error);
     }
   }
 });
 
-// Login
-client.login(token);
+client.login(config.bot.token);
