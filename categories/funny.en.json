@@ -1,0 +1,15 @@
+{
+  "emoji": "😂",
+  "description": "Light-hearted, goofy, and harmless fun.",
+  "language": "en",
+  "glowColor": "Blue",
+  "xpMultiplier": 1,
+  "truths": [
+    "What's the funniest thing you've ever done?",
+    "What silly habit do you still have?"
+  ],
+  "dares": [
+    "Talk like a robot for 30 seconds.",
+    "Send a random GIF in chat."
+  ]
+}

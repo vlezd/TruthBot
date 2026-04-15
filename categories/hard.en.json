@@ -1,0 +1,15 @@
+{
+  "emoji": "😈",
+  "description": "Serious, deep, and challenging questions.",
+  "language": "en",
+  "glowColor": "Red",
+  "xpMultiplier": 1.5,
+  "truths": [
+    "What’s a fear you’ve never admitted?",
+    "What’s the biggest mistake you’ve made?"
+  ],
+  "dares": [
+    "Let someone else pick your profile picture.",
+    "Send your last photo to the host."
+  ]
+}

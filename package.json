@@ -1,0 +1,13 @@
+{
+  "name": "truthbot",
+  "version": "1.0.0",
+  "description": "TruthBot - Truth or Dare Discord bot with XP, streaks, quests, and animated UI. Created by : Padelis",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3"
+  }
+}

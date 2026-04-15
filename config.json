@@ -1,0 +1,32 @@
+{
+  "bot": {
+    "token": "${BOT_TOKEN}",
+    "clientId": "${CLIENT_ID}",
+    "name": "TruthBot",
+    "presence": "TruthBot — Truth or Dare"
+  },
+  "paths": {
+    "categories": "./categories",
+    "xp": "./data/xp.json",
+    "quests": "./data/quests.json",
+    "leaderboard": "./data/leaderboard.json",
+    "userPrompts": "./data/user_prompts.json"
+  },
+  "cooldowns": {
+    "buttonCooldownMs": 5000
+  },
+  "xp": {
+    "truthXP": 10,
+    "dareXP": 15,
+    "streakBonusPerDay": 2,
+    "questTruthGoal": 3,
+    "questDareGoal": 2,
+    "questCategoryGoal": 2,
+    "questRewardXP": 20
+  },
+  "animations": {
+    "categoryRevealDelay": 900,
+    "truthDareRevealDelay": 700,
+    "glowSpeedMs": 500
+  }
+}
