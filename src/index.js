@@ -1,6 +1,8 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const path = require("path");
 const fs = require("fs");
+const token = process.env.BOT_TOKEN;
+const clientId = process.env.CLIENT_ID;
 const config = require("../config.json");
 const { loadCategories } = require("./systems/categories");
 
