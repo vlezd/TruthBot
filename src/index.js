@@ -1,6 +1,8 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const path = require("path");
 const fs = require("fs");
+const token = process.env.BOT_TOKEN;
+const clientId = process.env.CLIENT_ID;
 const config = require("../config.json");
 const { loadCategories } = require("./systems/categories");
 
@@ -28,7 +30,7 @@ const rest = new REST({ version: "10" }).setToken(config.token);
   try {
     console.log("Registering global application commands...");
     await rest.put(
-      Routes.applicationCommands(config.bot.clientId),
+      Routes.applicationCommands(config.clientId),
       { body: commands }
     );
     console.log("Commands registered globally.");
@@ -40,7 +42,7 @@ const rest = new REST({ version: "10" }).setToken(config.token);
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
   client.user.setPresence({
-    activities: [{ name: config.bot.presence }],
+    activities: [{ name: config.presence }],
     status: "online"
   });
   loadCategories();
