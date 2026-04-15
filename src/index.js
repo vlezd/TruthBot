@@ -69,4 +69,4 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-client.login(config.bot.token);
+client.login(config.token);
