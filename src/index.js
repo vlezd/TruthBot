@@ -22,7 +22,7 @@ for (const file of commandFiles) {
   }
 }
 
-const rest = new REST({ version: "10" }).setToken(config.bot.token);
+const rest = new REST({ version: "10" }).setToken(config.token);
 
 (async () => {
   try {
