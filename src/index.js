@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const token = process.env.BOT_TOKEN;
 const clientId = process.env.CLIENT_ID;
-const config = require("../config.json");
 const { loadCategories } = require("./systems/categories");
 
 const client = new Client({
@@ -30,9 +29,9 @@ const rest = new REST({ version: "10" }).setToken(config.bot.token);
   try {
     console.log("Registering global application commands...");
     await rest.put(
-      Routes.applicationCommands(config.bot.clientId),
-      { body: commands }
-    );
+  Routes.applicationCommands(clientId),
+  { body: commands }
+);
     console.log("Commands registered globally.");
   } catch (error) {
     console.error(error);
@@ -71,4 +70,4 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-client.login(config.bot.token);
+client.login(token);
