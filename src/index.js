@@ -1,10 +1,23 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const path = require("path");
 const fs = require("fs");
+const { loadCategories } = require("./systems/categories");
+
+// Load Railway environment variables
 const token = process.env.BOT_TOKEN;
 const clientId = process.env.CLIENT_ID;
-const config = require("../config.json");
-const { loadCategories } = require("./systems/categories");
+const presence = process.env.PRESENCE || "Truth or Dare";
+
+// Safety checks
+if (!token) {
+  console.error("❌ BOT_TOKEN missing in Railway Variables");
+  process.exit(1);
+}
+
+if (!clientId) {
+  console.error("❌ CLIENT_ID missing in Railway Variables");
+  process.exit(1);
+}
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -24,13 +37,14 @@ for (const file of commandFiles) {
   }
 }
 
-const rest = new REST({ version: "10" }).setToken(config.token);
+// Register slash commands using ENV token
+const rest = new REST({ version: "10" }).setToken(token);
 
 (async () => {
   try {
     console.log("Registering global application commands...");
     await rest.put(
-      Routes.applicationCommands(config.clientId),
+      Routes.applicationCommands(clientId),
       { body: commands }
     );
     console.log("Commands registered globally.");
@@ -42,7 +56,7 @@ const rest = new REST({ version: "10" }).setToken(config.token);
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
   client.user.setPresence({
-    activities: [{ name: config.presence }],
+    activities: [{ name: presence }],
     status: "online"
   });
   loadCategories();
@@ -61,7 +75,6 @@ client.on("interactionCreate", async interaction => {
       }
     }
   } else {
-    // Component / modal routing
     const tod = require("./commands/tod");
     try {
       await tod.handleComponent(interaction);
@@ -71,4 +84,4 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-client.login(config.token);
+client.login(token);
